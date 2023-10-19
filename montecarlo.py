@@ -6,7 +6,7 @@ carl = carlo(-3.0, 4.0, lambda x: x**3, 43.75, name="x_cubed")
 carl.calculate()
 carl.save_show_plot()
 
-
+"""
 carl_1 = carlo(0.0, 8, lambda x: x ** (1/3), true_value=12, name="cube root")
 carl_1.calculate()
 carl_1.save_show_plot()
@@ -27,3 +27,4 @@ carl_pi.calculate()
 carl_pi.all_results = carl_pi.all_results * 2  # integration gives us half of pi
 carl_pi.avg_results = carl_pi.avg_results * 2
 carl_pi.save_show_plot()
+"""

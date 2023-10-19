@@ -3,6 +3,8 @@
 from random import uniform
 import numpy as np
 from multiprocessing import Process, Array
+import matplotlib.pyplot as plt
+
 
 """
  C/n *(b - a)M
@@ -81,6 +83,37 @@ class monte:
         self.avg_results = np.mean(self.all_results, axis=1)
         return self.avg_results
 
+    def _split_work(self):
+        process_count = 8
+        area = (self.max1 - self.min1) * (self.b - self.a)
+        arr = np.empty(shape=(self.n_count, self.sets))
+
+        process_rows = [[] for _ in range(process_count)]
+        for i in range(self.n_count):
+            process_rows[i % process_count].append(i)
+
+        shared_array = Array('d', (self.n_count * self.sets))
+
+        process_list = []
+        for i in range(process_count):
+            process_list.append(Process(target=self._Process_task, args=(
+                shared_array, process_rows[i])))
+        for process in process_list:
+            process.start()
+
+        for process in process_list:
+            print("joining")
+            process.join()
+        arr = np.frombuffer(shared_array.get_obj(),
+                            dtype=np.float64).reshape(self.n_count, self.n_step)
+        return arr*area
+
+    def _Process_task(self, shared_array, rows):
+        for row in rows:
+            n = row * self.n_step
+            shared_array[n:(n + self.n_step)] = self._do_a_set(n +
+                                                               self.n_step)/(n+self.n_step)
+
 
 class fun:
     def __init__(self, function, eps=1000) -> None:
@@ -106,5 +139,27 @@ class fun:
 
 
 if __name__ == "__main__":
+    n_start = 50
+    n_end = 5000
+    n_step = 50
+    n_count = 100
+    sets = 50
+    mnt = monte(-3.0, 4.0, lambda x: x**3)
+    all_results = mnt.get_results()
+    avg_results = mnt.get_mean()
+    print("rendering plot")
+    plt.axhline(y=43.75, color='#00ff00',
+                linestyle='-', linewidth=3)
+    for i in range(n_count):  # n_count
+        plt.scatter(np.array((i*n_step+n_start,)*sets), all_results[i],
+                    label=f'Row {i}', color="b")
 
-    print("whoops")
+        plt.scatter(np.arange(n_start, n_end+1,
+                    n_step), avg_results, color="r")
+
+    figure = plt.gcf()  # get current figure
+    figure.set_size_inches(32, 18)
+    plt.savefig("graphs/" + "hhh.png", dpi=300)
+
+    fig = plt.figure()
+    plt.figure().clear()
