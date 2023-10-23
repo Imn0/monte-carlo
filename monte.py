@@ -73,8 +73,8 @@ class monte:
         return arr*area
 
     def get_results(self):
-        # self.all_results = self._do_all()
-        self.all_results = self._split_work()
+        self.all_results = self._do_all()
+        # self.all_results = self._split_work()
         return self.all_results
 
     def get_mean(self):
