@@ -1,4 +1,4 @@
-from monte import monte
+from monte_multi_thread import monte
 import math
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,7 +16,7 @@ class carlo:
     then save_show
     """
 
-    def __init__(self, start: float, stop: float, fun_to_integrate, true_value=0.0, n_start=50, n_end=5000, n_step=50, sets=50, name="function"):
+    def __init__(self, start: float, stop: float, fun_to_integrate, true_value=0.0, n_start=50, n_end=5000, n_step=50, sets=50, name="function", threads = 0):
         """
         name is whatever u want your graph to be named
         """
@@ -29,7 +29,7 @@ class carlo:
         self.sets = sets
         self.n_count = (n_end - n_start)//n_step + 1
         self.mnt = monte(start, stop, fun_to_integrate,
-                         n_start, n_end, n_step, sets)
+                         n_start, n_end, n_step, sets, threads)
         self.name = self.get_graph_name(name)
 
     def calculate(self):

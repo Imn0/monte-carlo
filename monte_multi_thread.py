@@ -27,7 +27,8 @@ class monte:
 
     """
 
-    def __init__(self, start: float, stop: float, fun_to_integrate, n_start=50, n_end=5000, n_step=50, sets=50):
+    def __init__(self, start: float, stop: float, fun_to_integrate, n_start=50, n_end=5000, n_step=50, sets=50, threads=0):
+        self.threads = threads
         self.a = start
         self.b = stop
         self.fun1 = fun(fun_to_integrate)
@@ -75,8 +76,10 @@ class monte:
         return arr*area
 
     def get_results(self):
-        # self.all_results = self._do_all()
-        self.all_results = self._split_work()
+        if self.threads > 1:
+            self.all_results = self._split_work()
+        else:
+            self.all_results = self._do_all()
         return self.all_results
 
     def get_mean(self):

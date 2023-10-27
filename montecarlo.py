@@ -10,9 +10,9 @@ import math
 # carl_1.calculate()
 # carl_1.save_show_plot()
 
-# carl_2 = carlo(0.0, math.pi, math.sin, true_value=2, name="sin")
-# carl_2.calculate()
-# carl_2.save_show_plot()
+carl_2 = carlo(0.0, math.pi, math.sin, true_value=2, name="sin",threads=4)
+carl_2.calculate()
+carl_2.save_show_plot()
 
 
 # carl_3 = carlo(0.0, 1, lambda x: 4*x*((1-x)**3), true_value=0.2, name="idk")
