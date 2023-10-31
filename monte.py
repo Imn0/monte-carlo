@@ -2,10 +2,12 @@
 # f(x)
 from random import uniform
 import numpy as np
+# import cupy as np
 from multiprocessing import Process, Array
+from tqdm import tqdm
 
 """
- C/n *(b - a)M
+    C/n *(b - a)M
 
     where C is the number of points in count of points that are counted as "inside the function", in code its count
 
@@ -14,75 +16,7 @@ from multiprocessing import Process, Array
     n is the number of points in current iteration
 """
 
-
-class monte:
-
-    """
-
-    Monte is for calculation only
-
-
-
-    """
-
-    def __init__(self, start: float, stop: float, fun_to_integrate, n_start=50, n_end=5000, n_step=50, sets=50):
-        self.a = start
-        self.b = stop
-        self.fun1 = fun(fun_to_integrate)
-        self.min1, self.max1 = self.fun1.min_max(self.a, self.b)
-        self.n_start = n_start
-        self.n_end = n_end
-        self.n_step = n_step
-        self.n_count = (n_end - n_start)//n_step + 1
-        self.sets = sets
-
-    def _do_a_set(self, n) -> np.array:
-        arr = np.empty(self.sets)
-        for i in range(self.sets):
-            arr[i] = self._do_a_one(n)
-        return arr
-
-    def _do_a_one(self, n) -> float:
-        count = 0
-        for i in range(n):
-            x = uniform(self.a, self.b)
-            y = uniform(self.min1, self.max1)
-            val = self.fun1.function(x)
-
-            if val >= 0:  # if function value is above X axis
-                if y >= 0 and y <= val:  # when point is above 0 and below function we count it
-                    count = count + 1
-            else:  # if function value is below X axis
-                if y <= 0 and y >= val:  # when point is below 0 and above function we count is a negative value
-                    count = count - 1
-
-        return count
-
-    def _do_all(self) -> np.array:
-        area = (self.max1 - self.min1) * (self.b - self.a)
-
-        arr = np.empty(shape=(self.n_count, self.sets))
-        count = 0
-        for i in range(self.n_start, self.n_end + 1, self.n_step):
-            arr[count] = self._do_a_set(i)/i  # here is the C/n step
-            count = count + 1
-            if count % 10 == 0:
-                print(f"{count/self.n_count * 100: .0f}%")
-
-        # here is *(b-a)M step, because are is the same for every iteration
-        return arr*area
-
-    def get_results(self):
-        self.all_results = self._do_all()
-        # self.all_results = self._split_work()
-        return self.all_results
-
-    def get_mean(self):
-        self.avg_results = np.mean(self.all_results, axis=1)
-        return self.avg_results
-
-
-class fun:
+class Fun:
     def __init__(self, function, eps=1000) -> None:
         self.function = function
         self.eps = eps
@@ -103,8 +37,109 @@ class fun:
                 max_val = cur
 
         return (min_val, max_val)
+    
+def deafault_eval_fun(fun: Fun, point: (float, float)) -> int:
+        val = fun.function(point[0])
+        if val >= 0:  # if function value is above X axis
+            if point[1] >= 0 and point[1] <= val:  # when point is above 0 and below function we count it
+                return 1
+        else:  # if function value is below X axis
+            if point[1] <= 0 and point[1] >= val:  # when point is below 0 and above function we count is a negative value
+                return - 1
+        return 0
 
 
-if __name__ == "__main__":
 
-    print("whoops")
+class Monte:
+
+    """
+    Monte is for calculation only
+    """
+
+    def __init__(self, start: float, stop: float, fun_to_integrate, n_start=50, n_end=5000, n_step=50, sets=50, threads=0, min_val = None, max_val = None, eval = None):
+        self.threads = threads
+        self.a = start
+        self.b = stop
+        self.fun = Fun(fun_to_integrate)
+
+        if min_val == None and max_val == None:
+            self.min, self.max = self.fun.min_max(self.a, self.b)
+        else:
+            self.min = min_val
+            self.max = max_val
+        if eval == None:
+            self.eval_function = deafault_eval_fun
+        else:
+            self.eval_function = eval
+            
+        self.n_start = n_start
+        self.n_end = n_end
+        self.n_step = n_step
+        self.n_count = (n_end - n_start)//n_step + 1
+        self.sets = sets
+
+    def _do_a_set(self, n) -> np.array:
+        arr = np.empty(self.sets)
+        for i in range(self.sets):
+            arr[i] = self._do_a_one(n)
+        return arr
+
+    def _do_a_one(self, n) -> int:
+        count = 0
+        for i in range(n):
+            x = np.random.uniform(self.a, self.b)
+            y = np.random.uniform(self.min, self.max)
+            count += self.eval_function(self.fun,(x,y))
+        return count
+
+    def _do_all(self) -> np.array:
+        area = (self.max - self.min) * (self.b - self.a)
+
+        arr = np.empty(shape=(self.n_count, self.sets))
+        count = 0
+        for i in tqdm(range(self.n_start, self.n_end + 1, self.n_step)):
+            arr[count] = self._do_a_set(i)/i  # here is the C/n step
+            count = count + 1
+
+        # here is *(b-a)M step, because are is the same for every iteration
+        return arr*area
+
+    def get_results(self):
+        if self.threads > 1:
+            self.all_results = self._split_work()
+        else:
+            self.all_results = self._do_all()
+        return self.all_results
+
+    def get_mean(self):
+        self.avg_results = np.mean(self.all_results, axis=1)
+        return self.avg_results
+
+    def _split_work(self):
+        area = (self.max - self.min) * (self.b - self.a)
+        arr = np.empty(shape=(self.n_count, self.sets))
+
+        process_rows = [[] for _ in range(self.threads)]
+        for i in range(self.n_count):
+            process_rows[i % self.threads].append(i)
+
+        shared_array = Array('d', (self.n_count * self.sets))
+
+        process_list = []
+        for i in range(self.threads):
+            process_list.append(Process(target=self._Process_task, args=(
+                shared_array, process_rows[i])))
+        for process in process_list:
+            process.start()
+
+        for process in process_list:
+            process.join()
+        arr = np.frombuffer(shared_array.get_obj(),
+                            dtype=np.float64).reshape(self.n_count, self.n_step)
+        return arr*area
+
+    def _Process_task(self, shared_array, rows):
+        for row in tqdm(rows, desc=f''):
+            n = row * self.n_step
+            shared_array[n:(n + self.n_step)] = self._do_a_set(n +
+                                                               self.n_step)/(n+self.n_step)

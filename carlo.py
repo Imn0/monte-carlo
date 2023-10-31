@@ -1,4 +1,4 @@
-from monte_multi_thread import monte
+from monte import Monte
 import math
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,7 +16,10 @@ class carlo:
     then save_show
     """
 
-    def __init__(self, start: float, stop: float, fun_to_integrate, true_value=0.0, n_start=50, n_end=5000, n_step=50, sets=50, name="function", threads = 0):
+    def __init__(self, start: float, stop: float, fun_to_integrate, true_value, 
+                n_start=50, n_end=5000, n_step=50, sets=50, name="function", 
+                threads = 0, 
+                min_val = None, max_val = None, eval_fun = None):
         """
         name is whatever u want your graph to be named
         """
@@ -28,13 +31,13 @@ class carlo:
         self.n_step = n_step
         self.sets = sets
         self.n_count = (n_end - n_start)//n_step + 1
-        self.mnt = monte(start, stop, fun_to_integrate,
-                         n_start, n_end, n_step, sets, threads)
+        self.monte = Monte(start, stop, fun_to_integrate,
+                         n_start, n_end, n_step, sets, threads, min_val, max_val, eval_fun)
         self.name = self.get_graph_name(name)
 
     def calculate(self):
-        self.all_results = self.mnt.get_results()
-        self.avg_results = self.mnt.get_mean()
+        self.all_results = self.monte.get_results()
+        self.avg_results = self.monte.get_mean()
 
     def save_show_plot(self, save=True, show=False):
         """
@@ -53,7 +56,7 @@ class carlo:
 
         if save:
             figure = plt.gcf()  # get current figure
-            figure.set_size_inches(32, 18)
+            figure.set_size_inches(16, 9)
             plt.savefig("graphs/"+self.name + ".png", dpi=300)
 
         if show:
