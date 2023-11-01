@@ -4,10 +4,10 @@ import numpy as np
 
 
 
-# carl = carlo(-3.0, 4.0, lambda x: x**3, 43.75, name="x_cubed")
-# carl.calculate()
-# carl.save_show_plot()
-
+carl = carlo(0.0, 2.0, lambda x: x*x, 2.66, name="x_cubed", n_start=5000, n_end=5000, n_step=50, sets=50 )
+carl.calculate()
+carl.save_show_plot(show=True)
+exit()
 carl_1 = carlo(0.0, 8, lambda x: np.cbrt(x), true_value=12, name="cube_root", threads=12, n_start=100000, n_end=100000, sets=100)
 carl_1.calculate()
 carl_1.save_show_plot()

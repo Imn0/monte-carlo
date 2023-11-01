@@ -18,7 +18,7 @@ class carlo:
 
     def __init__(self, start: np.single, stop: np.single, fun_to_integrate, true_value, 
                 n_start=50, n_end=5000, n_step=50, sets=50, name="function", 
-                threads = 0, 
+                threads = 1, 
                 min_val = None, max_val = None, eval_fun = None):
         """
         name is whatever u want your graph to be named

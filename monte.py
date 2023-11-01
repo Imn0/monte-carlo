@@ -15,30 +15,27 @@ from tqdm import tqdm
     n is the number of points in current iteration
 """
 
-class Fun:
-    def __init__(self, function, eps=1000) -> None:
-        self.function = function
-        self.eps = eps
 
-    def min_max(self, a: np.single,  b: np.single) -> tuple:
-        """ method to get minimal and maximal value of the function in given interval
-        :param a: start of the interval
-        :param b: end of the interval
-        """
-        n = int(abs(b - a)*self.eps)
-        min_val = self.function(a)
-        max_val = self.function(b)
-        for i in range(n):
-            cur = self.function(a + i / self.eps)
-            if cur < min_val:
-                min_val = cur
-            if cur > max_val:
-                max_val = cur
 
-        return (min_val, max_val)
+def min_max(function, a: np.single,  b: np.single, eps = 1000) -> tuple:
+    """ method to get minimal and maximal value of the function in given interval
+    :param a: start of the interval
+    :param b: end of the interval
+    """
+    n = int(abs(b - a)*eps)
+    min_val = function(a)
+    max_val = function(b)
+    for i in range(n):
+        cur = function(a + i / eps)
+        if cur < min_val:
+            min_val = cur
+        if cur > max_val:
+            max_val = cur
+
+    return (min_val, max_val)
     
-def deafault_eval_fun(fun: Fun, point: (np.single, np.single)) -> int:
-        val = fun.function(point[0])
+def deafault_eval_fun(fun, point: (np.single, np.single)) -> int:
+        val = fun(point[0])
         if val >= 0:  # if function value is above X axis
             if point[1] >= 0 and point[1] <= val:  # when point is above 0 and below function we count it
                 return 1
@@ -61,15 +58,15 @@ class Monte:
             print("well now we gonna sit like this")
             while True:
                 pass
-            
+
         self.threads = threads
 
         self.a = start
         self.b = stop
-        self.fun = Fun(fun_to_integrate)
+        self.fun = fun_to_integrate
 
         if min_val == None and max_val == None:
-            self.min, self.max = self.fun.min_max(self.a, self.b)
+            self.min, self.max = min_max(fun_to_integrate,self.a, self.b)
         else:
             self.min = min_val
             self.max = max_val
