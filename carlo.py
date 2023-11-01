@@ -2,7 +2,7 @@ from monte import Monte
 import math
 import matplotlib.pyplot as plt
 import numpy as np
-
+from pathlib import Path
 
 def x_squared(x):
     return math.sin(x)
@@ -16,7 +16,7 @@ class carlo:
     then save_show
     """
 
-    def __init__(self, start: float, stop: float, fun_to_integrate, true_value, 
+    def __init__(self, start: np.single, stop: np.single, fun_to_integrate, true_value, 
                 n_start=50, n_end=5000, n_step=50, sets=50, name="function", 
                 threads = 0, 
                 min_val = None, max_val = None, eval_fun = None):
@@ -44,6 +44,11 @@ class carlo:
         by deafault this function only saves graph to /graphs in current directory
         ajust 'save' and 'show' to do what u want
         """
+
+        Path("./graphs").mkdir(parents=True, exist_ok=True)
+
+        fig = plt.figure()
+        plt.figure().clear()
         print("rendering plot")
         plt.axhline(y=self.true_value, color='#00ff00',
                     linestyle='-', linewidth=3)
