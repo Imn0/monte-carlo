@@ -32,6 +32,8 @@ class MonteCarlo:
         print("saving results")
         all_results = carlo.all_results
         avg_results = carlo.avg_results
+        avg_all = np.mean(all_results)
         all_results.tofile(f'./results/{function_name}/all_{long_name}.csv', sep = ';')
         avg_results.tofile(f'./results/{function_name}/avg_{long_name}.csv', sep = ';')
+        avg_all.tofile(f'./results/{function_name}/avg_all_{long_name}.csv', sep = ';')
 

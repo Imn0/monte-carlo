@@ -70,9 +70,10 @@ class Carlo:
 
     def _do_for_one_n(self, n, _) -> int:
         count = 0
+        rng = np.random.default_rng()
         for _ in range(n):
-            x = np.random.uniform(self.a, self.b)
-            y = np.random.uniform(self.min, self.max)
+            x = (self.b - self.a) * rng.random(dtype=np.double) + self.a
+            y = (self.max - self.min) * rng.random(dtype=np.double) + self.min
             count += self.eval_function(self.fun, (x,y))
         return count
 

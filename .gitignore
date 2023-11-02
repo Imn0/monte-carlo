@@ -1,5 +1,6 @@
 /.vscode
-/results
+/results*
 /monte copy.py
 /tempCodeRunnerFile.py
 /__pycache__
+test.py
