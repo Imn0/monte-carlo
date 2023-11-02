@@ -81,11 +81,11 @@ class Carlo:
         f = partial(self._do_for_one_n, n)
         if platform.system() == 'Linux':
             with Pool(self.threads) as p:
-                r = list(tqdm(p.map(f, range(self.sets)), total=self.sets, desc=f"{count}/{self.n_count}"))
+                r = list(tqdm(p.map(f, range(self.sets)), total=self.sets, desc=f"{count+1}/{self.n_count}"))
                 return np.array(r)
         else:
             arr = np.empty(self.sets)
-            for k in tqdm(range(self.sets),total=self.sets, desc=f"{count}/{self.n_count}" ):
+            for k in tqdm(range(self.sets),total=self.sets, desc=f"{count+1}/{self.n_count}" ):
                 arr[k] = f(k)
             return arr
         
