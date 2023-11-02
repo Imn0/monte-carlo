@@ -6,7 +6,7 @@ from tqdm import tqdm
 from functools import partial
 
 
-def min_max(function, a: np.single,  b: np.single, eps) -> tuple:
+def min_max(function, a: np.double,  b: np.double, eps) -> tuple:
     """ method to get minimal and maximal value of the function in given interval
     :param a: start of the interval
     :param b: end of the interval
@@ -23,7 +23,7 @@ def min_max(function, a: np.single,  b: np.single, eps) -> tuple:
 
     return (min_val, max_val)
     
-def deafault_eval_fun(fun, point: (np.single, np.single)) -> int:
+def deafault_eval_fun(fun, point: (np.double, np.double)) -> int:
         val = fun(point[0])
         if val >= 0:  # if function value is above X axis
             if point[1] >= 0 and point[1] <= val:  # when point is above 0 and below function we count it
@@ -37,9 +37,9 @@ class Carlo:
     """
     Carlo is for calculation only
     """
-    def __init__(self, start: np.single, stop: np.single, fun_to_integrate, n_start: int, n_end: int, n_step: int, sets: int, 
+    def __init__(self, start: np.double, stop: np.double, fun_to_integrate, n_start: int, n_end: int, n_step: int, sets: int, 
                 thread_count=1, 
-                min_val = None, max_val = None, eval = None, eps = 1000):
+                min_val = None, max_val = None, eval = None, eps = 100000):
         
         if thread_count < 1: 
             print("well now we gonna sit like this")
@@ -70,10 +70,9 @@ class Carlo:
 
     def _do_for_one_n(self, n, _) -> int:
         count = 0
-        rng = np.random.default_rng()
         for _ in range(n):
-            x = (self.b - self.a) * rng.random(dtype=np.single) + self.a
-            y = (self.max - self.min) * rng.random(dtype=np.single) + self.min
+            x = np.random.uniform(self.a, self.b)
+            y = np.random.uniform(self.min, self.max)
             count += self.eval_function(self.fun, (x,y))
         return count
 
@@ -81,7 +80,8 @@ class Carlo:
         f = partial(self._do_for_one_n, n)
         if platform.system() == 'Linux':
             with Pool(self.threads) as p:
-                r = list(tqdm(p.map(f, range(self.sets)), total=self.sets, desc=f"{count+1}/{self.n_count}"))
+                r = tqdm(p.imap(f, range(self.sets)), total=self.sets, desc=f"{count+1}/{self.n_count}")
+                r = list(r)
                 return np.array(r)
         else:
             arr = np.empty(self.sets)
@@ -90,7 +90,7 @@ class Carlo:
             return arr
         
     def _do_all(self) -> np.array:
-        area = np.float32((self.max - self.min) * (self.b - self.a))
+        area = np.double((self.max - self.min) * (self.b - self.a))
 
         arr = np.empty(shape=(self.n_count, self.sets))
         count = 0

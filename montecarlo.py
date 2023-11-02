@@ -12,13 +12,17 @@ class MonteCarlo:
                 n_start=50, n_end=5000, n_step=50, sets=50, function_name="function", 
                 threads=1, 
                 min_val=None, max_val=None, eval_fun=None,
-                save_graph=True, show_graph=False):
+                save_graph=True, show_graph=False, eps = 100000):
+        
         Path("./results/" + function_name + "/").mkdir(parents=True, exist_ok=True)
         long_name = get_long_name(function_name, n_start, n_end, n_step, sets)
         print("Path created")
-        print("Creating caluculator")
+
+
+        print("Creating worker")
         carlo = Carlo(start, stop, fun_to_integrate,
-                         n_start, n_end, n_step, sets, threads, min_val, max_val, eval_fun)
+                         n_start, n_end, n_step, sets, threads, min_val, max_val, eval_fun, eps)
+        
         print("creating grapher")
         monte = Monte(true_value, n_start, n_end, n_step, sets, function_name, long_name, save_graph, show_graph)
         

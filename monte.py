@@ -38,6 +38,9 @@ class Monte:
         plt.scatter(np.arange(self.n_start, self.n_end+1,
                     self.n_step), avg_results, color="r")
 
+        plt.xlabel("n")
+        plt.ylabel("values")
+
         if self.save:
             figure = plt.gcf()  # get current figure
             figure.set_size_inches(16, 9)
