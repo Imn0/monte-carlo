@@ -30,14 +30,14 @@ class Monte:
 
         print("rendering plot")
         plt.axhline(y=self.true_value, color='#00ff00',
-                    linestyle='-', linewidth=3)
+                    linestyle='-', linewidth=1)
         for i in range(self.n_count):
-            plt.scatter(np.array((i*self.n_step+self.n_start,)*self.sets), all_results[i],
-                        label=f'Row {i}', color="b")
+            plt.scatter(np.array((i*self.n_step+self.n_start,)*self.sets), all_results[i], color="#aaa", s =2)
 
         plt.scatter(np.arange(self.n_start, self.n_end+1,
-                    self.n_step), avg_results, color="r")
-
+                    self.n_step), avg_results, color="r", s=4, label ="average")
+    
+        plt.legend(loc = "upper right")
         plt.xlabel("n")
         plt.ylabel("values")
 

@@ -79,7 +79,7 @@ class Carlo:
 
     def _do_one_set(self, n: int, count: int) -> np.array:
         f = partial(self._do_for_one_n, n)
-        if platform.system() == 'Linux':
+        if self.threads > 1 and platform.system() == 'Linux':
             with Pool(self.threads) as p:
                 r = tqdm(p.imap(f, range(self.sets)), total=self.sets, desc=f"{count+1}/{self.n_count}")
                 r = list(r)
