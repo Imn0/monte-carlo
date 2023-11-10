@@ -32,7 +32,7 @@ class MonteCarlo:
 
         monte = Monte(true_value, n_start, n_end, n_step, sets, function_name, long_name, save_graph, show_graph)
         
-        monte(all_results, avg_results)
+        monte([all_results, avg_results])
 
         print("saving results")
         all_results.tofile(f'./results/{function_name}/all_{long_name}.csv', sep = ';')
